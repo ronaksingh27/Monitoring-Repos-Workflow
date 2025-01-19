@@ -1,4 +1,4 @@
-name: Monitor Time
+name: Monitor Zulip Issues by alya
 
 on:
   schedule:
@@ -33,6 +33,7 @@ jobs:
           echo "Found issues by alya:"
           cat filtered_issues.txt
           echo "::set-output name=issues::$(cat filtered_issues.txt)"
+          echo "::set-output name=current_time::$CURRENT_TIME"
         else
           echo "No issues by alya found."
           echo "::set-output name=issues::"
@@ -51,6 +52,6 @@ jobs:
           The following issues were created by alya in the Zulip repository:
           ${{ steps.fetch-issues.outputs.issues }}
 
-          Current time on the host machine: $CURRENT_TIME
+          Current time on the host machine: ${{ steps.fetch-issues.outputs.current_time }}
         to: ronaksingh2708@gmail.com
         from: ${{ secrets.EMAIL_USERNAME }}
