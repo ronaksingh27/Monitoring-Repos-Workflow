@@ -54,5 +54,5 @@ jobs:
         body: |
           The following issues were created today by $USERNAME in your repository:
           ${{ steps.fetch-issues.outputs.issues }}
-        to: your-email@example.com
+        to: ronaksingh2708@gmail.com
         from: ${{ secrets.EMAIL_USERNAME }}
