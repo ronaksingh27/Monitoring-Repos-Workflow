@@ -16,7 +16,7 @@ jobs:
     - name: Fetch Issues Created Today by User
       id: fetch-issues
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ZULIP_TOKEN }}
       run: |
         # Specify the username to monitor
         USERNAME="ronaksingh27"
