@@ -26,7 +26,7 @@ jobs:
 
         # Fetch issues from the repository using the API
         curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-          https://api.github.com/ronaksingh27/Monitoring-Repos-Workflow/issues > issues.json
+          https://api.github.com/repos/ronaksingh27/Monitoring-Repos-Workflow/issues > issues.json
 
         # Filter issues created by the user and created today
         jq -r --arg TODAY "$TODAY" --arg USERNAME "$USERNAME" \
