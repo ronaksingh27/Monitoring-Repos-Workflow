@@ -18,9 +18,6 @@ jobs:
       env:
         ZULIP_TOKEN: ${{ secrets.ZULIP_TOKEN }}
       run: |
-        # Get today's date in the required format (YYYY-MM-DD)
-        TODAY=$(date +%Y-%m-%d)
-
         # Get current time of the host machine
         CURRENT_TIME=$(date)
 
@@ -28,16 +25,16 @@ jobs:
         curl -s -H "Authorization: Bearer $ZULIP_TOKEN" \
           https://api.github.com/repos/zulip/zulip/issues > issues.json
 
-        # Filter issues created by the user 'alya' and created today
-        jq -r --arg TODAY "$TODAY" '.[] | select(.user.login == "alya" and (.created_at | startswith($TODAY))) | .html_url' issues.json > filtered_issues.txt
+        # Filter issues created by the user 'alya'
+        jq -r '.[] | select(.user.login == "alya") | .html_url' issues.json > filtered_issues.txt
 
         # Output the results for use in later steps
         if [ -s filtered_issues.txt ]; then
-          echo "Found issues by alya created today:"
+          echo "Found issues by alya:"
           cat filtered_issues.txt
           echo "::set-output name=issues::$(cat filtered_issues.txt)"
         else
-          echo "No issues by alya found created today."
+          echo "No issues by alya found."
           echo "::set-output name=issues::"
         fi
 
@@ -51,9 +48,9 @@ jobs:
         password: ${{ secrets.EMAIL_PASSWORD }}
         subject: "New Issues by alya in Zulip Repository"
         body: |
-          The following issues were created by alya today in the Zulip repository:
+          The following issues were created by alya in the Zulip repository:
           ${{ steps.fetch-issues.outputs.issues }}
 
-          Current time on the host machine: ${{ steps.fetch-issues.outputs.current_time }}
+          Current time on the host machine: $CURRENT_TIME
         to: ronaksingh2708@gmail.com
         from: ${{ secrets.EMAIL_USERNAME }}
