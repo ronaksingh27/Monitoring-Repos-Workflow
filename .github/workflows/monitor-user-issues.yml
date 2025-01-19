@@ -1,0 +1,58 @@
+name: Monitor User Issues
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # Runs every 15 minutes
+  workflow_dispatch: # Allow manual trigger of the workflow
+
+jobs:
+  monitor-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Fetch Issues Created Today by User
+      id: fetch-issues
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Specify the username to monitor
+        USERNAME="ronaksingh27"
+        
+        # Get today's date in the required format (YYYY-MM-DD)
+        TODAY=$(date +%Y-%m-%d)
+
+        # Fetch issues from the repository using the API
+        curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+          https://api.github.com/repos/your-repo-owner/your-repo-name/issues > issues.json
+
+        # Filter issues created by the user and created today
+        jq -r --arg TODAY "$TODAY" --arg USERNAME "$USERNAME" \
+          '.[] | select(.user.login == $USERNAME and (.created_at | startswith($TODAY))) | "\(.html_url) created at \(.created_at)"' issues.json > filtered_issues.txt
+
+        # Output the results for use in later steps
+        if [ -s filtered_issues.txt ]; then
+          echo "Found issues created today by $USERNAME:"
+          cat filtered_issues.txt
+          echo "::set-output name=issues::$(cat filtered_issues.txt)"
+        else
+          echo "No issues created today by $USERNAME."
+          echo "::set-output name=issues::"
+        fi
+
+    - name: Send Email Notification
+      if: ${{ steps.fetch-issues.outputs.issues != '' }}
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "New Issues Created Today"
+        body: |
+          The following issues were created today by $USERNAME in your repository:
+          ${{ steps.fetch-issues.outputs.issues }}
+        to: your-email@example.com
+        from: ${{ secrets.EMAIL_USERNAME }}
