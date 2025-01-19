@@ -1,4 +1,4 @@
-name: Monitor Zulip Issues by alya
+name: Monitor Time
 
 on:
   schedule:
