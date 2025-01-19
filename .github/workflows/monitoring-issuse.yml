@@ -23,7 +23,7 @@ jobs:
 
         # Fetch issues from the Zulip repository using the API
         curl -s -H "Authorization: Bearer $ZULIP_TOKEN" \
-          https://api.github.com/repos/zulip/zulip/issues > issues.json
+          https://api.github.com/repos/ronaksingh27/Monitoring-Repos-Workflow/issues > issues.json
 
         # Filter issues created by the user 'alya' and created today
         jq -r --arg TODAY "$TODAY" '.[] | select(.user.login == "alya" and (.created_at | startswith($TODAY))) | .html_url' issues.json > filtered_issues.txt
